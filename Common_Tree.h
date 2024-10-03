@@ -24,10 +24,7 @@ public:
 		this->data = e;
 	}
 
-	~Tree()
-	{
-		
-	}
+	~Tree() = default;
 
 	//树结点的的连接
 
@@ -89,7 +86,25 @@ public:
 		}
 	}
 
+	
+	//所有空间释放由上层管理,因此舍弃此操作
+	////释放所有子树空间
+	//void Clear_ChildTree()
+	//{
+	//	//遍历释放空间并且置空
+	//	for (auto it = this->child_Tree.begin(); it != this->child_Tree.end(); it++)
+	//	{
+	//		auto p = *it;
+	//		*it = nullptr;
 
+	//		delete p;
+	//	}
+	//	//清空Child_Tree
+	//	this->child_Tree.clear();
+
+	//}
+
+	//注意树的根节点由上层析构
 
 };
 
@@ -99,29 +114,21 @@ class Tree_Manager//管理树的类，即包含对树的操作
 {
 public:
 
-	void InitTree(Tree<T>* tree)//初始化一个不存任何数据的节点，但不切断与父节点联系
-	{
-		if (!tree)//为空
-		{
-			tree = new Tree<T>();
-			return;
-		}
-		
-		delete
-	}
-	
-	void InitTree(Tree<T>* tree,T e)//以e初始化tree一个节点,覆盖原Tree,但不切断与父节点联系
+	//不考虑一个不存任何数据的节点，认为此节点为空树无意义
+	//此函数只负责tree节点及其子树
+	void InitTree(Tree<T>* tree,T e)//以e初始化或重置tree,覆盖原Tree,但如果有父节点不切断与父节点联系。
 	{
 		if (tree != nullptr)
 		{
-
+			tree->Clear_ChildTree();//清空子树
+			tree->data = e;//改变数据
 		}
 
-
-		return std::make_unique<Tree<T>>(new Tree(e));
+		//tree为空，即空树时,创建根节点
+		tree = new Tree<T>(e);
 	}
 
-
+	//释放整棵树为空树，如果有父节点则切断联系
 	void ClearTree(Tree<T>* tree)
 	{
 		//空节点直接返回
@@ -130,7 +137,7 @@ public:
 			return;
 		}
 
-		//切断与父节点联系
+		//（如果有）切断与父节点联系
 		if (tree->parent)
 		{
 			tree->parent->child_Tree.std::remove(tree->parent->child_Tree.begin(), tree->parent->child_Tree.end(), tree);
@@ -148,8 +155,190 @@ public:
 
 		//销毁此节点
 		delete tree;
+
+		//置空
+		tree = nullptr;
+
 		return;
 
 	}
 
+
+	//判断是否为空树
+	bool TreeEmpty(Tree<T>* tree)
+	{
+		if (tree)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	//返回Tree的深度
+	int TreeDepth(Tree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return 0;
+		}
+
+		//只有根节点
+		if (tree->child_Tree.empty())
+		{
+			return 1;
+		}
+
+		//递归找子树深度
+		std::vector<int> depth;
+		for (int i = 0; i < tree->child_Tree.size(); i++)
+		{
+			depth.push_back(TreeDepth(tree->child_Tree[i]));
+		}
+
+		//找最大值即子树最大深度
+		auto max = std::max_element(depth.begin(), depth.end());
+
+		return *max + 1;
+
+	}
+
+	//返回根节点
+	Tree<T>* RootTree(Tree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return nullptr;
+		}
+
+		//为根节点
+		if (tree->parent == nullptr)
+		{
+			return tree;
+		}
+
+		//不是根节点则向上递归
+		return RootTree(tree->parent);
+
+	}
+
+	T ValueTree(Tree<T>* tree)
+	{
+		if (tree)
+		{
+			return tree->data;
+		}
+		else
+		{
+			//为空时
+			return NULL;
+		}
+	}
+
+	//更改数据
+	void AssignTree(Tree<T>* tree, T e)
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		tree->data = e;
+		return;
+	}
+
+	//返回父节点
+	Tree<T>* ParentTree(Tree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return nullptr;
+		}
+
+		//为根节点时返回nullptr
+		return tree->parent;
+	}
+
+	//返回最左子树
+	Tree<T>* LeftChildTree(Tree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return nullptr;
+		}
+
+		//无子树
+		if (tree->child_Tree.empty())
+		{
+			return nullptr;
+		}
+
+		return tree->child_Tree[0];
+	}
+
+	//返回最右子树，注意最左最右子树可能相同
+	Tree<T>* RightChildTree(Tree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return nullptr;
+		}
+
+		//无子树
+		if (tree->child_Tree.empty())
+		{
+			return nullptr;
+		}
+
+		return tree->child_Tree[tree->child_Tree.size()-1];
+	}
+
+	//插入第pos棵子树，如果pos不在parent子树范围内，则插入最右边
+	void InsertChildTree(Tree<T>* parent, Tree<T>* child, int pos)
+	{
+		//判断父节点和子树是否为空
+		if (!parent || !child)
+		{
+			return;
+		}
+
+		//pos判断
+		if (pos<1 || pos>parent->child_Tree.size())//插入最右边
+		{
+			parent->AddChild(child);
+		}
+
+		child->parent = parent;
+
+		//覆盖原位置子树
+		ClearTree(parent->child_Tree[pos]);
+		parent->child_Tree[pos] = child;
+	}
+	
+	//删除第pos棵子树，如果pos不在parent子树范围内，则操作无意义
+	void DeleteChildTree(Tree<T>* parent, int pos)
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		//在范围内
+		if (pos > 0 && pos <= parent->child_Tree.size())
+		{
+			//此操作只是将子树释放置空
+			ClearTree(parent->child_Tree[pos - 1]);
+			//从Child_Tree中删除
+			auto it = parent->child_Tree.begin() + pos - 1;
+			parent->child_Tree.erase(it);
+		}
+
+	}
 };
