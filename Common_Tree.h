@@ -144,7 +144,7 @@ public:
 
 		
 		//有子树时递归销毁销毁子树
-		if (tree->child_Tree.size() ！= 0)
+		if (tree->child_Tree.size() != 0)
 		{
 			for (int i = 0; i < tree->child_Tree.size(); i++)
 			{
@@ -324,7 +324,7 @@ public:
 	void DeleteChildTree(Tree<T>* parent, int pos)
 	{
 		//空树
-		if (!tree)
+		if (!parent)
 		{
 			return;
 		}
@@ -343,9 +343,7 @@ public:
 
 	//前序遍历
 	//这里function不一定返回空，具体视情况而立,默认为输出data
-	//因此可以重用模板
-	template<class K>
-	void PreOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<K> address = [](T e)->T {std::cout << e; })
+	void PreOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<void(T)> address = [](T e)->void {std::cout << e; })
 	{
 		//空树
 		if (!tree)
@@ -367,7 +365,7 @@ public:
 	}
 
 	//后序遍历
-	void PostOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<K> address = [](T e)->T {std::cout << e; })
+	void PostOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<void(T)> address = [](T e)->void {std::cout << e; })
 	{
 		//空树
 		if (!tree)
@@ -394,7 +392,7 @@ public:
 	void InOrderTraverseTree(Tree<T>* tree) = delete;
 
 	//层序遍历
-	void LevelOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<K> address = [](T e)->T {std::cout << e; })
+	void LevelOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<void(T)> address = [](T e)->void {std::cout << e; })
 	{
 		//空树
 		if (!tree)
@@ -411,12 +409,39 @@ public:
 			//处理当前节点
 			address(now_tree);
 			//吧当前节点的子树放入队列
-			for (auto it = now_tree->child_Tree.begin; it != now_tree->child_Tree.ene(); i++)
+			for (auto it = now_tree->child_Tree.begin; it != now_tree->child_Tree.ene(); it++)
 			{
 				trees.push(*it);
 			}
 		}
 		return;
+	}
 
+	//找到第一个值为e的节点
+	Tree<T>* FindTree(Tree<T>* tree, T e)
+	{
+		if (!tree)
+		{
+			return nullptr;
+		}
+
+		//此节点
+		if (tree->data == e)
+		{
+			return tree;
+		}
+
+		for (auto it = tree->child_Tree.begin(); it != tree->child_Tree.end(); it++)
+		{
+			//从子树找
+			Tree<T>* node = FindTree(*it);
+			if (node)
+			{
+				return node;
+			}
+		}
+
+		//找不到
+		return nullptr
 	}
 };
