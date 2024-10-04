@@ -2,6 +2,8 @@
 #include<iostream>
 #include<algorithm>
 #include<vector>
+#include<queue>//层次遍历时使用
+#include<functional>
 
 //此头文件为普通树的实现，用vector存储子树
 //基于树的结构为递归的，所以在这里将数据结构和对其的操作分开封装
@@ -138,10 +140,7 @@ public:
 		}
 
 		//（如果有）切断与父节点联系
-		if (tree->parent)
-		{
-			tree->parent->child_Tree.std::remove(tree->parent->child_Tree.begin(), tree->parent->child_Tree.end(), tree);
-		}
+		tree->DeleteParent();
 
 		
 		//有子树时递归销毁销毁子树
@@ -339,6 +338,85 @@ public:
 			auto it = parent->child_Tree.begin() + pos - 1;
 			parent->child_Tree.erase(it);
 		}
+
+	}
+
+	//前序遍历
+	//这里function不一定返回空，具体视情况而立,默认为输出data
+	//因此可以重用模板
+	template<class K>
+	void PreOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<K> address = [](T e)->T {std::cout << e; })
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		//根节点
+		address(tree->data);
+
+		//递归遍历子树
+		for (auto it = tree->child_Tree.begin(); it != tree->child_Tree.end(); it++)
+		{
+			PreOrderTraverseTree(*it);
+		}
+
+		return;
+
+	}
+
+	//后序遍历
+	void PostOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<K> address = [](T e)->T {std::cout << e; })
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+	
+		//递归遍历子树
+		for (auto it = tree->child_Tree.begin(); it != tree->child_Tree.end(); it++)
+		{
+			PostOrderTraverseTree(*it);
+		}
+
+		//根节点
+		address(tree->data);
+
+
+		return;
+
+	}
+
+	//普通树没有中序遍历
+	void InOrderTraverseTree(Tree<T>* tree) = delete;
+
+	//层序遍历
+	void LevelOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<K> address = [](T e)->T {std::cout << e; })
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		std::queue<Tree<T>*> trees;
+		trees.push(tree);
+		while (!trees.empty())
+		{
+			Tree<T>* now_tree = trees.front();
+			trees.pop();
+			//处理当前节点
+			address(now_tree);
+			//吧当前节点的子树放入队列
+			for (auto it = now_tree->child_Tree.begin; it != now_tree->child_Tree.ene(); i++)
+			{
+				trees.push(*it);
+			}
+		}
+		return;
 
 	}
 };
