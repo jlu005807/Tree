@@ -7,7 +7,7 @@
 
 //此头文件为普通树的实现，用vector存储子树
 //基于树的结构为递归的，所以在这里将数据结构和对其的操作分开封装
-//当创建了一个Tree,必须最后销毁Tree
+//当创建了一个Tree,必须最后销毁Tree,Tree类不负责空间分配和销毁
 
 template<class T>
 struct Tree
@@ -32,7 +32,7 @@ public:
 
 	void AddChild(Tree<T>* child)//添加子树
 	{
-		if (!child&&child==this)//空树或者自身
+		if (!child||child==this)//空树或者自身
 		{
 			return;
 		}
@@ -69,10 +69,10 @@ public:
 		}
 
 		//寻找子树
-		auto it = this->child_Tree.std::find(child_Tree.begin(), child_Tree.end(), child);
+		auto it = std::find(child_Tree.begin(), child_Tree.end(), child);
 		if (it != child_Tree.end())//找到
 		{
-			*it->parent = nullptr;//脱离
+			(*it)->parent = nullptr;//脱离
 			this->child_Tree.erase(it);
 		}
 
@@ -115,19 +115,34 @@ template<class T>
 class Tree_Manager//管理树的类，即包含对树的操作
 {
 public:
+	
+	//创建一个data为e的树节点
+	Tree<T>* CreatTree(T e)
+	{
+		return new Tree<T>(e);
+	}
+
 
 	//不考虑一个不存任何数据的节点，认为此节点为空树无意义
 	//此函数只负责tree节点及其子树
+	//不负责创建树节点
 	void InitTree(Tree<T>* tree,T e)//以e初始化或重置tree,覆盖原Tree,但如果有父节点不切断与父节点联系。
 	{
 		if (tree != nullptr)
 		{
-			tree->Clear_ChildTree();//清空子树
+			//清空子树
+			for (auto it = tree->child_Tree.begin(); it != tree->child_Tree.end(); it++)
+			{
+				ClearTree(*it);
+			}
+			tree->child_Tree.clear();
+
 			tree->data = e;//改变数据
+
+			return;
 		}
 
-		//tree为空，即空树时,创建根节点
-		tree = new Tree<T>(e);
+		//tree为空，即空树时,操作无意义
 	}
 
 	//释放整棵树为空树，如果有父节点则切断联系
@@ -313,6 +328,8 @@ public:
 			parent->AddChild(child);
 		}
 
+		//如果子树有父节点需要移除
+		child->DeleteParent();
 		child->parent = parent;
 
 		//覆盖原位置子树
@@ -442,6 +459,6 @@ public:
 		}
 
 		//找不到
-		return nullptr
+		return nullptr;
 	}
 };

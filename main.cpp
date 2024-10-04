@@ -12,8 +12,10 @@ int main()
 
 	//Common_Tree
 	Tree_Manager<int> manager;
-	Tree<int>* root;
+	Tree<int>* root=manager.CreatTree(1);
+	std::cout << root->data;
 	manager.InitTree(root, 9);
-	root->AddChild()
+	std::cout << root->data;
+	system("Pause");
 
 }
