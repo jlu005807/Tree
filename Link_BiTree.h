@@ -1,7 +1,8 @@
 #pragma once
 //链式二叉树
 #include<iostream>
-
+#include<functional>
+#include<queue>
 
 //同Common_Tree一般
 //基于树的结构为递归的，所以在这里将数据结构和对其的操作分开封装
@@ -81,21 +82,39 @@ public:
 		parent->AddChild(this, pos);
 	}
 
+	//删除左子树
+	void DeleteleftChild()
+	{
+		//有左子树，并且不是线索
+		if (this->leftChild && !this->leftTag)
+		{
+			this->leftChild->parent = nullptr;
+			this->leftChild = nullptr;
+		}
+	}
+
+	//删除右子树
+	void DeleterightChild()
+	{
+		//有右子树，并且不是线索
+		if (this->rightChild && !this->rightTag)
+		{
+			this->rightChild->parent = nullptr;
+			this->rightChild = nullptr;
+		}
+	}
+
 	//删除子树
 	void DeleteChild(int pos)
 	{
 		//不考虑空间问题
 		if (pos == 0)
 		{
-			if (this->leftChild)
-				this->leftChild->parent = nullptr;
-			this->leftChild = nullptr;
+			DeleteleftChild();
 		}
 		else if (pos == 1)
 		{
-			if (this->rightChild)
-				this->rightChild->parent = nullptr;
-			this->rightChild = nullptr;
+			DeleterightChild();
 		}
 	}
 
@@ -131,6 +150,35 @@ class BiTree_Manager
 		return new BiTree<T>(e);
 	}
 
+	//以一个数组创造一棵树,没有线索化
+	BiTree<T>* CreatTree(T a[], int begin, int number)//begin即数组起始位置
+	{
+		if (begin < 0 || begin >= number)
+		{
+			return nullptr;
+		}
+
+		//根节点
+		BiTree<T>* tree = new BiTree<T>(a[begin]);
+
+		//子树
+		BiTree<T>* left = CreatTree(a, begin * 2 + 1, number);
+		BiTree<T>* right = CreatTree(a, begin * 2 + 2, number);
+
+		if (p != nullptr)
+		{
+			tree->AddChild(left,0);
+		}
+
+		if (q != nullptr)
+		{
+			tree->AddChild(right,1);
+		}
+
+		return tree;
+
+	}
+
 	//不考虑一个不存任何数据的节点，认为此节点为空树无意义
 	//此函数只负责tree节点及其子树
 	//不负责创建树节点
@@ -139,15 +187,15 @@ class BiTree_Manager
 		if (tree != nullptr)
 		{
 			//清空子树
-			//有子树时递归销毁销毁子树
-			if (tree->leftChild)
+			//有子树时并且不是线索递归销毁销毁子树
+			if (tree->leftChild && !tree->leftTag)
 			{
 				ClearTree(tree->leftChild);
 			}
 
-			if (tree->rightChild)
+			if (tree->rightChild && !tree->rightTag)
 			{
-				ClearTree(tree->rightChild)l
+				ClearTree(tree->rightChild);
 			}
 	
 
@@ -173,14 +221,14 @@ class BiTree_Manager
 
 
 		//有子树时递归销毁销毁子树
-		if (tree->leftChild)
+		if (tree->leftChild && !tree->leftTag)
 		{
 			ClearTree(tree->leftChild);
 		}
 
-		if (tree->rightChild)
+		if (tree->rightChild && !tree->rightTag)
 		{
-			ClearTree(tree->rightChild)l
+			ClearTree(tree->rightChild);
 		}
 
 		//销毁此节点
@@ -192,4 +240,416 @@ class BiTree_Manager
 		return;
 
 	}
+
+	//判断是否为空树
+	bool TreeEmpty(BiTree<T>* tree)
+	{
+		if (tree)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	//返回Tree的深度
+	int TreeDepth(BiTree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return 0;
+		}
+
+		//非线索
+		int left=0, right=0;//纪律左右子树深度
+
+		if (!tree->leftTag)
+		{
+			left = TreeDepth(tree->leftChild);
+		}
+
+		if (!tree->rightTag)
+		{
+			right = TreeDepth(tree->rightChild);
+		}
+		
+		return left > right ? left+1 : right+1;
+	}
+
+	//返回根节点
+	BiTree<T>* RootTree(BiTree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return nullptr;
+		}
+
+		//为根节点
+		if (tree->parent == nullptr)
+		{
+			return tree;
+		}
+
+		//不是根节点则向上递归
+		return RootTree(tree->parent);
+	}
+
+	T ValueTree(BiTree<T>* tree)
+	{
+		if (tree)
+		{
+			return tree->data;
+		}
+		else
+		{
+			//为空时
+			return NULL;
+		}
+	}
+
+	//更改数据
+	void AssignTree(BiTree<T>* tree, T e)
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		tree->data = e;
+		return;
+	}
+
+	//返回父节点
+	BiTree<T>* ParentTree(BiTree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return nullptr;
+		}
+
+		//为根节点时返回nullptr
+		return tree->parent;
+	}
+
+	BiTree<T>* LeftChild(BiTree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return nullptr;
+		}
+
+		//不为线索
+		if (!tree->leftTag)
+		{
+			//可能为空
+			return tree->leftChild;
+		}
+
+		//左子树为空
+		return nullptr;
+	}
+
+	BiTree<T>* RightChild(BiTree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return nullptr;
+		}
+
+		//不为线索
+		if (!tree->rightTag)
+		{
+			//可能为空
+			return tree->rightChild;
+		}
+
+		//右子树为空
+		return nullptr;
+	}
+
+	//返回tree的左兄弟。若tree是parent的左孩子或无左兄弟，则返回空
+	BiTree<T>* LeftSibling(BiTree<T>* tree)
+	{
+		//空树或者无父节点或者父节点左子树为线索
+		if (!tree||tree->parent||tree->parent->leftTag)
+		{
+			return nullptr;
+		}
+
+		//tree为左子树,parent左子树为空
+		if (tree->parent->leftChild==tree||!tree->parent->leftChild)
+		{
+			//可能为空
+			return nullptr;
+		}
+
+		//返回父节点的左子树，即tree的左兄弟
+		return tree->parent->leftChild;
+	}
+
+	//返回tree的右兄弟。若tree是parent的右孩子或无右兄弟，则返回空
+	BiTree<T>* LeftSibling(BiTree<T>* tree)
+	{
+		//空树或者无父节点或者父节点右子树为线索
+		if (!tree || tree->parent||tree->parent->rightTag)
+		{
+			return nullptr;
+		}
+
+		//tree为右子树,parent右子树为空
+		if (tree->parent->rightChild == tree || !tree->parent->rightChild)
+		{
+			//可能为空
+			return nullptr;
+		}
+
+		//返回父节点的右子树，即tree的右兄弟
+		return tree->parent->rightChild;
+	}
+
+	//插入后线索失效，需要重新生成
+	//将child插入为parent的左节点，两棵树不相交，如果有原左子树，则变为child的最右下子树
+	void InsertleftChild(BiTree<T>* parent, BiTree<T>* child)
+	{
+		//一者为空或者两者相同
+		if (!parent || !child || parent == child)
+		{
+			return;
+		}
+
+		//左子树不空且不为线索
+		if (parent->leftChild && !parent->leftTag)
+		{
+			BiTree<T>* p = parent->leftChild;//记录下来
+		}
+
+		//插入
+		parent->AddleftChild(child);
+
+		BiTree<T>* q = child->rightChild;
+		while (q->rightChild && !q->parent->rightTag)
+		{
+			q = q->rightChild;
+		}
+		//找到child最右下子树
+		q->AddrightChild(p);
+	}
+
+	//将child插入为parent的左节点，两棵树不相交，如果有原右子树，则变为child的最右下子树
+	void InsertRightChild(BiTree<T>* parent, BiTree<T>* child)
+	{
+		//一者为空或者两者相同
+		if (!parent || !child || parent == child)
+		{
+			return;
+		}
+
+		//左子树不空且不为线索
+		if (parent->rightChild && !parent->rightTag)
+		{
+			BiTree<T>* p = parent->leftChild;//记录下来
+		}
+
+		//插入
+		parent->AddrightChild(child);
+
+		BiTree<T>* q = child->rightChild;
+		while (q->rightChild && !q->parent->rightTag)
+		{
+			q = q->rightChild;
+		}
+		//找到child最右下子树
+		q->AddrightChild(p);
+	}
+
+	//pos为0插入左子树，1插入右子树，其他无意义
+	void InsertChild(BiTree<T>* parent,BiTree<T>* child,int pos)
+	{
+		if (pos == 0)
+		{
+			InsertleftChild(parent, child);
+		}
+		else if (pos == 1)
+		{
+			InsertRightChild(parent, child);
+		}
+	}
+
+	//删除后线索失效
+	//tree删除左子树，返回左子树，不负责释放空间
+	BiTree<T>* DeleteLeftChild(BiTree<T>* tree)
+	{
+		//空树或者左子树为空或者为线索
+		if (!tree || !tree->leftChild || tree->leftTag)
+		{
+			return nullptr;
+		}
+
+		//记录左子树
+		Tree<T>* p = tree->leftChild;
+
+		tree->DeleteleftChild();
+
+		return p;
+	}
+
+	//tree删除右子树，返回右子树，不负责释放空间
+	BiTree<T>* DeleteRightChild(BiTree<T>* tree)
+	{
+		//空树或者右子树为空或者为线索
+		if (!tree || !tree->rightChild || tree->rightTag)
+		{
+			return nullptr;
+		}
+
+		//记录右子树
+		Tree<T>* p = tree->rightChild;
+
+		tree->DeleterightChild();
+
+		return p;
+	}
+
+	//pos为0删除左子树，1删除右子树，其他无意义
+	BiTree<T>* DeleteChild(BiTree<T>* parent, int pos)
+	{
+		if (pos == 0)
+		{
+			DeleteLeftChild(parent);
+		}
+		else if (pos == 1)
+		{
+			DeleteRightChild(parent);
+		}
+
+		return;
+	}
+
+	//前序遍历
+	//这里function不一定返回空，具体视情况而立,默认为输出data
+	void PreOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		//根节点
+		address(tree->data);
+
+		//遍历左子树
+		if (tree->leftChild && !tree->leftTag)
+		{
+			PreOrderTraverseTree(tree->leftChild, address);
+		}
+
+		//遍历右子树
+		if (tree->rightChild && !tree->rightTag)
+		{
+			PreOrderTraverseTree(tree->rightChild, address);
+		}
+
+		return;
+
+	}
+
+	//中序遍历
+	void InOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		//遍历左子树
+		if (tree->leftChild && !tree->leftTag)
+		{
+			InOrderTraverseTree(tree->leftChild, address);
+		}
+
+		//根节点
+		address(tree->data);
+
+		//遍历右子树
+		if (tree->rightChild && !tree->rightTag)
+		{
+			InOrderTraverseTree(tree->rightChild, address);
+		}
+
+		return;
+
+	}
+
+	//后序遍历
+	void PostOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		//遍历左子树
+		if (tree->leftChild && !tree->leftTag)
+		{
+			InOrderTraverseTree(tree->leftChild, address);
+		}
+
+		//遍历右子树
+		if (tree->rightChild && !tree->rightTag)
+		{
+			InOrderTraverseTree(tree->rightChild, address);
+		}
+
+		//根节点
+		address(tree->data);
+
+		return;
+
+	}
+
+	//层次遍历
+	void LevelOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		std::queue<BiTree<T>*> trees;
+		trees.push(tree);
+
+		while (!trees.empty())
+		{
+			BiTree<T>* p = trees.front();
+			trees.pop();
+			address(p->data);
+
+			//左子树
+			if (p->leftChild && !p->leftTag)
+			{
+				trees.push(p->leftChild)
+			}
+
+			//遍历右子树
+			if (p->rightChild && !p->rightTag)
+			{
+				trees.push(p->rightChild);
+			}
+
+		}
+
+		return;
+
+	}
+
 };

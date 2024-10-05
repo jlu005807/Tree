@@ -340,7 +340,7 @@ public:
 		return tree->child_Tree[tree->child_Tree.size()-1];
 	}
 
-	//插入子树，插入最右边
+	//插入子树，插入最右边,两棵树不相交
 	void InsertChildTree(Tree<T>* parent, Tree<T>* child)
 	{
 		//判断父节点和子树是否为空
@@ -376,7 +376,7 @@ public:
 
 	//前序遍历
 	//这里function不一定返回空，具体视情况而立,默认为输出data
-	void PreOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<void(T)> address = [](T e)->void {std::cout << e; })
+	void PreOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
 	{
 		//空树
 		if (!tree)
@@ -398,7 +398,7 @@ public:
 	}
 
 	//后序遍历
-	void PostOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<void(T)> address = [](T e)->void {std::cout << e; })
+	void PostOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
 	{
 		//空树
 		if (!tree)
@@ -410,7 +410,7 @@ public:
 		//递归遍历子树
 		for (auto it = tree->child_Tree.begin(); it != tree->child_Tree.end(); it++)
 		{
-			PostOrderTraverseTree(*it);
+			PostOrderTraverseTree(*it,address);
 		}
 
 		//根节点
@@ -425,7 +425,7 @@ public:
 	void InOrderTraverseTree(Tree<T>* tree) = delete;
 
 	//层序遍历
-	void LevelOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<void(T)> address = [](T e)->void {std::cout << e; })
+	void LevelOrderTraverseTree(Tree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
 	{
 		//空树
 		if (!tree)

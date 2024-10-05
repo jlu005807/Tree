@@ -80,7 +80,7 @@ public:
 	}
 
 	//后序遍历
-	void PostOrderTraverseTree(int index,/*处理函数*/std::function<void(T)> address = [](T e)->void {std::cout << e; })
+	void PostOrderTraverseTree(int index,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
 	{
 		//开始索引错误
 		if (!IsIndex(index))
@@ -89,10 +89,10 @@ public:
 		}
 		
 		//遍历左子树
-		PostOrderTraverseTree(index * 2 + 1);
+		PostOrderTraverseTree(index * 2 + 1,address);
 
 		//遍历右子树
-		PostOrderTraverseTree(index * 2 + 2);
+		PostOrderTraverseTree(index * 2 + 2,address);
 
 		//根节点
 		address(tree[index]);
@@ -101,7 +101,7 @@ public:
 	}
 
 	//前序遍历
-	void PreOrderTraverseTree(int index,/*处理函数*/std::function<void(T)> address = [](T e)->void {std::cout << e; })
+	void PreOrderTraverseTree(int index,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
 	{
 		//开始索引错误
 		if (!IsIndex(index))
@@ -113,16 +113,16 @@ public:
 		address(tree[index]);
 
 		//遍历左子树
-		PreOrderTraverseTree(index * 2 + 1);
+		PreOrderTraverseTree(index * 2 + 1,address);
 
 		//遍历右子树
-		PreOrderTraverseTree(index * 2 + 2);
+		PreOrderTraverseTree(index * 2 + 2,address);
 
 		return;
 	}
 
 	//中序遍历
-	void InOrderTraverseTree(int index,/*处理函数*/std::function<void(T)> address = [](T e)->void {std::cout << e; })
+	void InOrderTraverseTree(int index,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
 	{
 		//开始索引错误
 		if (!IsIndex(index))
@@ -131,19 +131,19 @@ public:
 		}
 
 		//遍历左子树
-		InOrderTraverseTree(index * 2 + 1);
+		InOrderTraverseTree(index * 2 + 1,address);
 
 		//根节点
 		address(tree[index]);
 
 		//遍历右子树
-		InOrderTraverseTree(index * 2 + 2);
+		InOrderTraverseTree(index * 2 + 2,address);
 
 		return;
 	}
 
 	//层次遍历
-	void LevelOrderTraverseTree(int index,/*处理函数*/std::function<void(T)> address = [](T e)->void {std::cout << e; })
+	void LevelOrderTraverseTree(int index,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
 	{
 		for (int i = 0; i < tree.size(); i++)
 		{
