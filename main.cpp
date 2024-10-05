@@ -7,15 +7,24 @@ int main()
 	//Complete_Tree
 	//int a[9] = { 1,2,3,4,5,6,7,8,9 };
 	//Complete_BiTree<int> bitree(a, 9);
-	//bitree.InOrderTraverseTree(0);
+	//bitree.LevelOrderTraverseTree(0);
 	//system("Pause");
 
 	//Common_Tree
 	Tree_Manager<int> manager;
-	Tree<int>* root=manager.CreatTree(1);
-	std::cout << root->data;
-	manager.InitTree(root, 9);
-	std::cout << root->data;
+	int b[9] = { 1,2,3,4,5,6,7,8,9 };
+	Tree<int>* root=manager.CreatTree(b,0,9);
+	manager.LevelOrderTraverseTree(root);
 	system("Pause");
+
+	manager.DeleteChildTree(root, 2);
+	manager.LevelOrderTraverseTree(root);
+	system("Pause");
+
+	Tree<int>* p = manager.CreatTree(b, 2, 9);
+	manager.InsertChildTree(root, p);
+	manager.LevelOrderTraverseTree(root);
+	system("Pause");
+	
 
 }

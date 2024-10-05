@@ -122,6 +122,34 @@ public:
 		return new Tree<T>(e);
 	}
 
+	//以一个数组创造一棵树，并类似于二叉树
+	Tree<T>* CreatTree(T a[], int begin, int number)//begin即数组起始位置
+	{
+		if (begin < 0 || begin >= number)
+		{
+			return nullptr;
+		}
+
+		//根节点
+		Tree<T>* tree = new Tree<T>(a[begin]);
+
+		//子树
+		Tree<T>* p = CreatTree(a, begin * 2 + 1, number);
+		Tree<T>* q = CreatTree(a, begin * 2 + 2, number);
+
+		if (p != nullptr)
+		{
+			tree->AddChild(p);
+		}
+
+		if (q != nullptr)
+		{
+			tree->AddChild(q);
+		}
+
+		return tree;
+
+	}
 
 	//不考虑一个不存任何数据的节点，认为此节点为空树无意义
 	//此函数只负责tree节点及其子树
@@ -151,7 +179,7 @@ public:
 		//空节点直接返回
 		if (tree == nullptr)
 		{
-			return;
+			return; 
 		}
 
 		//（如果有）切断与父节点联系
@@ -161,17 +189,16 @@ public:
 		//有子树时递归销毁销毁子树
 		if (tree->child_Tree.size() != 0)
 		{
-			for (int i = 0; i < tree->child_Tree.size(); i++)
+			while (!tree->child_Tree.empty())
 			{
-				ClearTree(tree->child_Tree[i]);
+				auto it = tree->child_Tree.begin();
+				ClearTree((*it));
 			}
 		}
 
 		//销毁此节点
 		delete tree;
 
-		//置空
-		tree = nullptr;
 
 		return;
 
@@ -313,8 +340,8 @@ public:
 		return tree->child_Tree[tree->child_Tree.size()-1];
 	}
 
-	//插入第pos棵子树，如果pos不在parent子树范围内，则插入最右边
-	void InsertChildTree(Tree<T>* parent, Tree<T>* child, int pos)
+	//插入子树，插入最右边
+	void InsertChildTree(Tree<T>* parent, Tree<T>* child)
 	{
 		//判断父节点和子树是否为空
 		if (!parent || !child)
@@ -323,18 +350,10 @@ public:
 		}
 
 		//pos判断
-		if (pos<1 || pos>parent->child_Tree.size())//插入最右边
-		{
-			parent->AddChild(child);
-		}
 
 		//如果子树有父节点需要移除
 		child->DeleteParent();
-		child->parent = parent;
-
-		//覆盖原位置子树
-		ClearTree(parent->child_Tree[pos]);
-		parent->child_Tree[pos] = child;
+		parent->AddChild(child);
 	}
 	
 	//删除第pos棵子树，如果pos不在parent子树范围内，则操作无意义
@@ -349,11 +368,8 @@ public:
 		//在范围内
 		if (pos > 0 && pos <= parent->child_Tree.size())
 		{
-			//此操作只是将子树释放置空
+			//此操作只是将子树释放置空,并脱离父节点
 			ClearTree(parent->child_Tree[pos - 1]);
-			//从Child_Tree中删除
-			auto it = parent->child_Tree.begin() + pos - 1;
-			parent->child_Tree.erase(it);
 		}
 
 	}
@@ -424,9 +440,9 @@ public:
 			Tree<T>* now_tree = trees.front();
 			trees.pop();
 			//处理当前节点
-			address(now_tree);
+			address(now_tree->data);
 			//吧当前节点的子树放入队列
-			for (auto it = now_tree->child_Tree.begin; it != now_tree->child_Tree.ene(); it++)
+			for (auto it = now_tree->child_Tree.begin(); it != now_tree->child_Tree.end(); it++)
 			{
 				trees.push(*it);
 			}
@@ -451,7 +467,7 @@ public:
 		for (auto it = tree->child_Tree.begin(); it != tree->child_Tree.end(); it++)
 		{
 			//从子树找
-			Tree<T>* node = FindTree(*it);
+			Tree<T>* node = FindTree(*it,e);
 			if (node)
 			{
 				return node;
