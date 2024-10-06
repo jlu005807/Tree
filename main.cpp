@@ -24,6 +24,7 @@ int main()
 	Tree<int>* p = manager.CreatTree(b, 2, 9);
 	manager.InsertChildTree(root, p);
 	manager.LevelOrderTraverseTree(root);
+	std::cout << std::endl << manager.TreeNumber(root);
 	system("Pause");
 	
 

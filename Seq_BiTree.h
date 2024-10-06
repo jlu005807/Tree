@@ -151,6 +151,11 @@ public:
 		}
 	}
 
+	int TreeNumber()
+	{
+		return tree.size();
+	}
+
 
 private:
 

@@ -477,4 +477,23 @@ public:
 		//找不到
 		return nullptr;
 	}
+
+	//返回树节点数量
+	int TreeNumber(Tree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return 0;
+		}
+
+		int number = 1;
+
+		for (auto it = tree->child_Tree.begin(); it != tree->child_Tree.end(); it++)
+		{
+			number += TreeNumber(*it);
+		}
+
+		return number;
+	}
 };

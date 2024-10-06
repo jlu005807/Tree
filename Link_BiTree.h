@@ -179,6 +179,39 @@ class BiTree_Manager
 
 	}
 
+	//复制一个树,如果有树为空操作无意义，并且两树不相交
+	BiTree<T>* CreatTree(BiTree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return nullptr;
+		}
+
+		BiTree<T>* new_tree = new BiTree<T>(tree->data);
+
+		//创建左子树
+		BiTree<T>* p;
+		if (tree->leftChild && !tree->leftTag)
+		{
+			p = CreatTree(tree->leftChild);
+		}
+
+		//创建右子树
+		BiTree<T>* q;
+		if (tree->rightChild && !tree->rightTag)
+		{
+		     q = CreatTree(tree->rightChild);
+		}
+
+		new_tree->AddleftChild(p);
+		new_tree->AddrightChild(q);
+
+		return new_tree;
+
+
+	}
+
 	//不考虑一个不存任何数据的节点，认为此节点为空树无意义
 	//此函数只负责tree节点及其子树
 	//不负责创建树节点
@@ -521,14 +554,14 @@ class BiTree_Manager
 	{
 		if (pos == 0)
 		{
-			DeleteLeftChild(parent);
+			return DeleteLeftChild(parent);
 		}
 		else if (pos == 1)
 		{
-			DeleteRightChild(parent);
+			return DeleteRightChild(parent);
 		}
 
-		return;
+		return nullptr;
 	}
 
 	//前序遍历
@@ -651,5 +684,33 @@ class BiTree_Manager
 		return;
 
 	}
+
+	//返回节点数
+	int TreeNumber(BiTree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return 0;
+		}
+
+		int number = 1;
+
+		//左子树不空，并且不是线索
+		if (tree->leftChild && !tree->leftTag)
+		{
+			number += TreeNumber(tree->leftChild);
+		}
+
+		//右子树不空，并且不是线索
+		if (tree->rightChild && !tree->rightTag)
+		{
+			number += TreeNumber(tree->rightChild);
+		}
+
+		return number;
+	}
+	
+	
 
 };
