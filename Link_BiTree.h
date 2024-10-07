@@ -91,6 +91,7 @@ public:
 			this->leftChild->parent = nullptr;
 			this->leftChild = nullptr;
 		}
+		return;
 	}
 
 	//删除右子树
@@ -102,6 +103,7 @@ public:
 			this->rightChild->parent = nullptr;
 			this->rightChild = nullptr;
 		}
+		return;
 	}
 
 	//删除子树
@@ -121,17 +123,12 @@ public:
 	//删除父节点
 	void DeleteParent()
 	{
-		if (!parent)
-		{
-			return;
-		}
-		
-		if (parent->leftChild == this)
-		{
-			parent->DeleteChild(0);
+			
+		if (parent&&parent->leftChild == this)
+		{			parent->DeleteChild(0);
 		}
 
-		if (parent->rightChild == this)
+		if (parent&&parent->rightChild == this)
 		{
 			parent->DeleteChild(1);
 		}
@@ -144,6 +141,7 @@ public:
 template<class T>
 class BiTree_Manager
 {
+public:
 	//创建一个data为e的树节点
 	BiTree<T>* CreatTree(T e)
 	{
@@ -165,12 +163,12 @@ class BiTree_Manager
 		BiTree<T>* left = CreatTree(a, begin * 2 + 1, number);
 		BiTree<T>* right = CreatTree(a, begin * 2 + 2, number);
 
-		if (p != nullptr)
+		if (left != nullptr)
 		{
 			tree->AddChild(left,0);
 		}
 
-		if (q != nullptr)
+		if (right != nullptr)
 		{
 			tree->AddChild(right,1);
 		}
@@ -205,6 +203,7 @@ class BiTree_Manager
 		}
 
 		new_tree->AddleftChild(p);
+
 		new_tree->AddrightChild(q);
 
 		return new_tree;
@@ -352,6 +351,7 @@ class BiTree_Manager
 		}
 
 		tree->data = e;
+
 		return;
 	}
 
@@ -427,7 +427,7 @@ class BiTree_Manager
 	}
 
 	//返回tree的右兄弟。若tree是parent的右孩子或无右兄弟，则返回空
-	BiTree<T>* LeftSibling(BiTree<T>* tree)
+	BiTree<T>* RightSibling(BiTree<T>* tree)
 	{
 		//空树或者无父节点或者父节点右子树为线索
 		if (!tree || tree->parent||tree->parent->rightTag)
@@ -457,16 +457,17 @@ class BiTree_Manager
 		}
 
 		//左子树不空且不为线索
+		BiTree<T>* p = nullptr;
 		if (parent->leftChild && !parent->leftTag)
 		{
-			BiTree<T>* p = parent->leftChild;//记录下来
+			p = parent->leftChild;//记录下来
 		}
 
 		//插入
 		parent->AddleftChild(child);
 
 		BiTree<T>* q = child->rightChild;
-		while (q->rightChild && !q->parent->rightTag)
+		while (q->rightChild && !q->rightTag)
 		{
 			q = q->rightChild;
 		}
@@ -483,17 +484,18 @@ class BiTree_Manager
 			return;
 		}
 
-		//左子树不空且不为线索
+		//右子树不空且不为线索
+		BiTree<T>* p = nullptr;
 		if (parent->rightChild && !parent->rightTag)
 		{
-			BiTree<T>* p = parent->leftChild;//记录下来
+			p = parent->rightChild;//记录下来
 		}
 
 		//插入
 		parent->AddrightChild(child);
 
 		BiTree<T>* q = child->rightChild;
-		while (q->rightChild && !q->parent->rightTag)
+		while (q->rightChild && !q->rightTag)
 		{
 			q = q->rightChild;
 		}
@@ -525,7 +527,7 @@ class BiTree_Manager
 		}
 
 		//记录左子树
-		Tree<T>* p = tree->leftChild;
+		BiTree<T>* p = tree->leftChild;
 
 		tree->DeleteleftChild();
 
@@ -542,7 +544,7 @@ class BiTree_Manager
 		}
 
 		//记录右子树
-		Tree<T>* p = tree->rightChild;
+		BiTree<T>* p = tree->rightChild;
 
 		tree->DeleterightChild();
 
@@ -665,12 +667,13 @@ class BiTree_Manager
 		{
 			BiTree<T>* p = trees.front();
 			trees.pop();
+
 			address(p->data);
 
 			//左子树
 			if (p->leftChild && !p->leftTag)
 			{
-				trees.push(p->leftChild)
+				trees.push(p->leftChild);
 			}
 
 			//遍历右子树
@@ -711,6 +714,114 @@ class BiTree_Manager
 		return number;
 	}
 	
-	
+	//消除线索化，使得更改过的树重新线索化
+	void DeleteThreading(BiTree<T>* tree)
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+		
+		//取消左子树线索化
+		if (tree->leftTag)
+		{
+			tree->leftChild = nullptr;
+			tree->leftTag = false;
+		}
+		else
+		{
+			DeleteThreading(tree->leftChild);
+		}
+
+		//取消右子树线索化
+		if (tree->rightTag)
+		{
+			tree->rightChild = nullptr;
+			tree->rightTag = false;
+		}
+		else
+		{
+			DeleteThreading(tree->rightChild);
+		}
+
+		return;
+	}
+
+
+	//默认tree没有线索化，如果已经线索化需要消除线索化
+	//pre是全局变址，初始化时其右孩子指针为空，便于在树的最左点开始建线索
+	//二叉树中序线索化
+	void InThreading(BiTree<T>* tree, BiTree<T>* pre)
+	{
+		//非空树
+		if (tree)
+		{
+			InThreading(tree->leftChild, pre);//左子树递归线索化
+
+			//左子树为空,线索化
+			if (!tree->leftChild)
+			{
+				tree->leftTag = true;
+				//左子树指向前驱，即pre
+				tree->leftChild = pre;
+			}
+			else
+			{
+				tree->leftTag = false;
+			}
+
+			//前驱右子树为空
+			if (!pre->rightChild)
+			{
+				pre->rightTag = true;
+				//右子树指向后继，即tree
+				pre->rightChild = tree;
+			}
+			else
+			{
+				pre->rightTag = false;
+			}
+
+			//前移
+			pre = tree;
+
+			InThreading(tree->rightChild, pre);//右子树递归线索化
+		
+		}
+	}
+
+	//返回一个左子树指向根节点的头结点Thrt
+	//带头结点的二叉树中序线索化
+	BiTree<T>* InOrderThreading(BiTree<T>* tree)
+	{
+		//中序遍历二叉树，并将其线索化。Thrt指向头结点
+		BiTree<T>* Thrt = new BiTree<T>();//创建头结点
+
+		Thrt->leftTag = false;//头结点有左子树，若树非空，则其左子树为树的根节点
+		Thrt->rightTag = true;//头结点的右子树指针为右线索
+		Thrt->rightChild = Thrt;//初始化右指针指向头结点
+		
+		if (!tree)
+		{
+			Thrt->leftChild = Thrt;//如果树为空，左指针也指向头结点
+		}
+		else
+		{
+			Thrt->leftChild = tree;//左指针指向根结点
+			//pre初值指向头结点
+			BiTree<T>* pre = Thrt;
+			InThreading(tree, pre);//线索化
+			//pre最后为最右结点，pre的右线索指向头结点
+			pre->rightChild = Thrt;
+			pre->rightTag = true;
+			Thrt->rightChild = pre;//头结点的右线索指向pre，即树的最右结点
+		}
+
+		return Thrt;//返回头结点
+	}
+
+
+
 
 };
