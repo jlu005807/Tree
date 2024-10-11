@@ -2,6 +2,7 @@
 //链式二叉树
 #include<iostream>
 #include<functional>
+#include<vector>//当作栈使用实现非递归
 #include<queue>
 
 //同Common_Tree一般
@@ -101,7 +102,7 @@ public:
 		if (this->rightChild && !this->rightTag)
 		{
 			this->rightChild->parent = nullptr;
-			this->rightChild = nullptr;
+			this->rightChild = nullptr;//二级指针时，此函数会使调用DeleteParent()的子树置空了。
 		}
 		return;
 	}
@@ -125,12 +126,18 @@ public:
 	{
 			
 		if (parent&&parent->leftChild == this)
-		{			parent->DeleteChild(0);
+		{			
+			parent->DeleteChild(0);
 		}
 
 		if (parent&&parent->rightChild == this)
 		{
 			parent->DeleteChild(1);
+		}
+
+		if (this)
+		{
+			std::cout << "999";
 		}
 
 		return;
@@ -240,7 +247,7 @@ public:
 	}
 
 	//释放整棵树为空树，如果有父节点则切断联系
-	void ClearTree(BiTree<T>* tree)
+	void ClearTree(BiTree<T>*& tree)//传入二级指针保证最后可以置空指针
 	{
 		//空节点直接返回
 		if (tree == nullptr)
@@ -248,10 +255,7 @@ public:
 			return;
 		}
 
-		//（如果有）切断与父节点联系
-		tree->DeleteParent();
-
-
+	
 		//有子树时递归销毁销毁子树
 		if (tree->leftChild && !tree->leftTag)
 		{
@@ -262,6 +266,9 @@ public:
 		{
 			ClearTree(tree->rightChild);
 		}
+
+		//（如果有）切断与父节点联系,注意传入二级指针时，需要在遍历完左右子树后在切断联系，避免在此函数内将tree置空了
+		tree->DeleteParent();
 
 		//销毁此节点
 		delete tree;
@@ -307,6 +314,25 @@ public:
 		}
 		
 		return left > right ? left+1 : right+1;
+	}
+
+	//根到结点v,的路径长度称为结点v的深度
+	//返回结点v的深度，从一开始
+	int ChildTreeHight(BiTree<T>* v)
+	{
+		//空树
+		if (!v)
+		{
+			return 0;
+		}
+
+		return ChildTreeHight(v->parent) + 1;
+
+		//非递归
+		//int i=1;
+		//for (i; v->parent; i++) { v = v->parent; }
+		//return i;
+
 	}
 
 	//返回根节点
@@ -595,6 +621,27 @@ public:
 
 	}
 
+	//非递归前序遍历
+	//这里function不一定返回空，具体视情况而立,默认为输出data
+	void Non_Recursive_PreOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		//初始化栈
+		std::vector<BiTree<T>*> stack;
+
+		BiTree<T>* current = tree;//当前结点
+
+		//当前节点非空且不是线索
+		
+
+	}
+
+
 	//中序遍历
 	void InOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
 	{
@@ -752,7 +799,7 @@ public:
 	//默认tree没有线索化，如果已经线索化需要消除线索化
 	//pre是全局变址，初始化时其右孩子指针为空，便于在树的最左点开始建线索
 	//二叉树中序线索化
-	void InThreading(BiTree<T>* tree, BiTree<T>* pre)
+	void InThreading(BiTree<T>* tree, BiTree<T>*& pre)//因为要改变pre,所以需要传入二级指针
 	{
 		//非空树
 		if (tree)

@@ -174,7 +174,7 @@ public:
 	}
 
 	//释放整棵树为空树，如果有父节点则切断联系
-	void ClearTree(Tree<T>* tree)
+	void ClearTree(Tree<T>*& tree)
 	{
 		//空节点直接返回
 		if (tree == nullptr)
@@ -196,9 +196,13 @@ public:
 			}
 		}
 
+		//（如果有）切断与父节点联系，同二叉树一般，需操作完在进行切断
+		tree->DeleteParent();
+
 		//销毁此节点
 		delete tree;
 
+		tree = nullptr;
 
 		return;
 
@@ -216,7 +220,7 @@ public:
 		return true;
 	}
 
-	//返回Tree的深度
+	//返回Tree的深度,根节点层数为1，即只有根节点的树深度为1
 	int TreeDepth(Tree<T>* tree)
 	{
 		//空树
@@ -244,6 +248,27 @@ public:
 		return *max + 1;
 
 	}
+
+	
+	//根到结点v,的路径长度称为结点v的深度
+	//返回结点v的深度，从一开始
+	int ChildTreeHight(Tree<T>* v)
+	{
+		//空树
+		if (!v)
+		{
+			return 0;
+		}
+
+		return ChildTreeHight(v->parent) + 1;
+
+		//非递归
+		//int i=1;
+		//for (i; v->parent; i++) { v = v->parent; }
+		//return i;
+
+	}
+
 
 	//返回根节点
 	Tree<T>* RootTree(Tree<T>* tree)

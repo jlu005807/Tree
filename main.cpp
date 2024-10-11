@@ -51,6 +51,9 @@ int main()
 	bimanager.LevelOrderTraverseTree(root1);
 	system("Pause");
 
+	bimanager.InOrderThreading(root1);
+
+
 	bimanager.ClearTree(root1);
 
 	
