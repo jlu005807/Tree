@@ -135,11 +135,6 @@ public:
 			parent->DeleteChild(1);
 		}
 
-		if (this)
-		{
-			std::cout << "999";
-		}
-
 		return;
 	}
 	
@@ -635,9 +630,38 @@ public:
 		std::vector<BiTree<T>*> stack;
 
 		BiTree<T>* current = tree;//当前结点
+	
+		//暴力解决线索树的非递归遍历，先取消线索化
+		DeleteThreading(tree);
 
-		//当前节点非空且不是线索
-		
+		//当前结点非空或者栈非空
+		while(current||!stack.empty())
+		{
+			//遍历完左节点
+			while (current)
+			{
+				stack.push_back(current);//当前结点存入栈中，以便后面遍历
+				current = current->leftChild;
+			}
+
+			//此时结点为空，但栈区不空，恢复工作现场
+			if (!stack.empty())
+			{
+				//回溯结点
+				current = stack.back();
+				
+				//删除此节点
+				stack.pop_back();
+
+				//处理此节点
+				address(current->data);
+
+				//转向右子树
+				current = current->rightChild;
+
+			}
+
+		}
 
 	}
 

@@ -48,11 +48,15 @@ int main()
 	system("Pause");
 
 	bimanager.InsertChild(root1, p1, 1);
-	bimanager.LevelOrderTraverseTree(root1);
+	bimanager.InOrderTraverseTree(root1);
+	system("Pause");
+
+	bimanager.Non_Recursive_PreOrderTraverseTree(root1);
 	system("Pause");
 
 	bimanager.InOrderThreading(root1);
 
+	bimanager.DeleteThreading(root1);
 
 	bimanager.ClearTree(root1);
 
