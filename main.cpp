@@ -1,6 +1,7 @@
 #include"Common_Tree.h"
 #include"Seq_BiTree.h"
 #include"Link_BiTree.h"
+#include"HuffmanTree.h"
 
 int main()
 {
@@ -48,10 +49,10 @@ int main()
 	system("Pause");
 
 	bimanager.InsertChild(root1, p1, 1);
-	bimanager.InOrderTraverseTree(root1);
+	bimanager.PostOrderTraverseTree(root1);
 	system("Pause");
 
-	bimanager.Non_Recursive_PreOrderTraverseTree(root1);
+	bimanager.Non_Recursive_PostOrderTraverseTree(root1);
 	system("Pause");
 
 	bimanager.InOrderThreading(root1);
@@ -59,6 +60,13 @@ int main()
 	bimanager.DeleteThreading(root1);
 
 	bimanager.ClearTree(root1);
+
+	HuffmanTree_manager<int> human;
+
+	int a[1] = { 1 };
+
+	HuffmanTree<int>* tree = human.CreatTree(a, 1);
+
 
 	
 

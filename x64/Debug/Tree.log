@@ -1,2 +1,3 @@
 ﻿  main.cpp
+D:\Visual Studio 2022\source\repos\Tree\Tree\HuffmanTree.h(122,1): warning C4715: “HuffmanTree_manager<int>::CreatTree”: 不是所有的控件路径都返回值
   Tree.vcxproj -> D:\Visual Studio 2022\source\repos\Tree\x64\Debug\Tree.exe

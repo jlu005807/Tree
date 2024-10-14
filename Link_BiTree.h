@@ -587,6 +587,57 @@ public:
 		return nullptr;
 	}
 
+	//非递归前序遍历
+	void Non_Recursive_PreOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		//初始化栈
+		std::vector<BiTree<T>*> stack;
+
+		BiTree<T>* current = tree;//当前结点
+
+		//暴力解决线索树的非递归遍历，先取消线索化
+		DeleteThreading(tree);
+
+		//当前结点非空或者栈非空
+		while (current || !stack.empty())
+		{
+			//遍历完左节点
+			if(current)
+			{
+				//处理根节点
+				address(current->data);
+
+				stack.push_back(current);//当前结点存入栈中，以便后面遍历
+
+				//遍历左子树
+				current = current->leftChild;
+			}
+
+			//此时结点为空，但栈区不空，恢复工作现场
+			else
+			{
+				//回溯结点
+				current = stack.back();
+
+				//删除此节点
+				stack.pop_back();
+
+				//转向右子树
+				current = current->rightChild;
+
+			}
+
+		}
+
+	}
+
+
 	//前序遍历
 	//这里function不一定返回空，具体视情况而立,默认为输出data
 	void PreOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
@@ -616,9 +667,9 @@ public:
 
 	}
 
-	//非递归前序遍历
+	//非递归中序遍历
 	//这里function不一定返回空，具体视情况而立,默认为输出data
-	void Non_Recursive_PreOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
+	void Non_Recursive_InOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
 	{
 		//空树
 		if (!tree)
@@ -638,14 +689,14 @@ public:
 		while(current||!stack.empty())
 		{
 			//遍历完左节点
-			while (current)
+			if(current)
 			{
 				stack.push_back(current);//当前结点存入栈中，以便后面遍历
 				current = current->leftChild;
 			}
 
 			//此时结点为空，但栈区不空，恢复工作现场
-			if (!stack.empty())
+			else if(!stack.empty())
 			{
 				//回溯结点
 				current = stack.back();
@@ -691,6 +742,66 @@ public:
 		}
 
 		return;
+
+	}
+
+	//非递归后序遍历
+	void Non_Recursive_PostOrderTraverseTree(BiTree<T>* tree,/*处理函数*/std::function<void(T&)> address = [](T& e)->void {std::cout << e; })
+	{
+		//空树
+		if (!tree)
+		{
+			return;
+		}
+
+		//初始化栈
+		std::vector<BiTree<T>*> stack;
+
+		BiTree<T>* current = tree;//当前结点
+
+		BiTree<T>* lastVisite = nullptr;//记录上个结点
+
+		//暴力解决线索树的非递归遍历，先取消线索化
+		DeleteThreading(tree);
+
+		//当前结点非空或者栈非空
+		while (current || !stack.empty())
+		{
+			//遍历完左节点
+			if (current)
+			{
+				stack.push_back(current);//当前结点存入栈中，以便后面遍历
+
+				//移动到左子树
+				current = current->leftChild;
+			}
+
+			//此时结点为空，但栈区不空，恢复工作现场
+			else
+			{
+				//返回栈顶结点
+				BiTree<T>* top = stack.back();
+
+				//检查右子树存在并未被访问
+				if (top->rightChild && lastVisite != top->rightChild)
+				{
+					//移动到右子树
+					current = top->rightChild;
+				}
+				else
+				{
+					//右子树不存在或者已被访问
+					address(top->data);
+
+					//记录
+					lastVisite = top;
+
+					stack.pop_back();//弹出结点
+				}
+
+			}
+
+		}
 
 	}
 
