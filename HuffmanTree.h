@@ -1,7 +1,7 @@
 #pragma once
 #include<iostream>
 #include<climits>
-
+#include<vector>
 
 //哈夫曼(Huffman)树又称最优树，是一类带权路径长度最短的树。
 //在哈夫曼树中，权值越大的结点离根结点越近。
@@ -68,25 +68,24 @@ public:
 			HT[i].weight = a[i - 1];
 		}
 
+
 		/*－ －－－－ －－－－－ －初始化工作结束， 下面开始创建哈夫曼树－ － － － －－－－－－ */
 
 		//构造选择函数Select
-		//在 HT[k] (l:e;;;k:e;;;i-1) 中选择两个其双亲域为0 且权值最小的结点，并返回它们在 HT 中的序号 sl和 s2
+		//在 HT[k]中选择两个其双亲域为0 且权值最小的结点，并返回它们在 HT 中的序号 sl和 s2
 		auto Select = [&](int pos, int& s1, int& s2)->void
 		{
 
 			//表示没找到
-			s1 = 0;
-			s2 = 0;
+			/*s1 = 0;
+			s2 = 0;*/
 
 			// 初始化最小值
 			int minWeight1 = INT_MAX;
 			int minWeight2 = INT_MAX;
 
-
 			// 遍历数组寻找两个权值最小的节点
-			for (int i = 0; i < 
-				pos; i++)
+			for (int i = 1; i <= pos; i++)
 			{
 				if (HT[i].parent == 0 && HT[i].weight < minWeight1) {
 					minWeight2 = minWeight1;
@@ -94,22 +93,31 @@ public:
 					minWeight1 = HT[i].weight;
 					s1 = i;
 				}
-				else if (HT[i].parent == 0 && HT[i].weight < minWeight2 && HT[i].weight != minWeight1) {
+				else if (HT[i].parent == 0 && HT[i].weight <= minWeight2) {
 					minWeight2 = HT[i].weight;
 					s2 = i;
 				}
 			}
+
 		};
 
+		//归并
 		for (int i = num + 1; i <= m; i++)
 		{
 			//通过 n-1 次的选择、删除 、 合并来创建哈夫曼树
-			int s1, s2;
+			int s1=0, s2=0;
 
 			Select(i - 1, s1, s2);
 
-			HT[s1].parent = i;
-			HT[s2].parent = i;
+			if(s1!=0)
+			{
+				HT[s1].parent = i;
+			}
+
+			if(s2!=0)
+			{
+				HT[s2].parent = i;
+			}
 
 		    //得到新结点i, 从森林中删除sl, s2, 将sl和s2的双亲域由0改为i
 			HT[i].lchild = s1;
@@ -117,8 +125,53 @@ public:
 
 			//i的权值为左右孩子权值之和
 			HT[i].weight = HT[s1].weight + HT[s2].weight;
+		}
 
+		return HT;
+	}
+
+	//在构造哈夫曼树之后，求哈夫曼编码的主要思想是：依次以叶子为出发点，向上回溯至根结点为止。 
+	//回溯时走左分支则生成代码 0, 走右分支则生成代码l
+	//建立哈夫曼编码，将哈夫曼树的n个叶子节点逆向到根节点编码，存在vector中
+	void HuffmanTreeCode(HuffmanTree<int>* HT, std::vector<std::string>& codes, int n)
+	{
+		//空树
+		if (!HT)
+		{
+			return;
+		}
+
+		//清空codes
+		codes.clear();
+	
+		for (int i = 1; i <= n; i++)
+		{
+			std::string v;//存放当前结点的前缀编码
+
+			int k = i;
+			int index = HT[i].parent;//index指向k的父节点
+
+			while (index != 0)
+			{
+				//结点c是f的左孩子， 则生成代码0
+				if (HT[index].lchild == k)
+				{
+					v = "0" + v;
+				}
+				else //结点c是f的右孩子， 则生成代码1
+				{
+					v = "1" + v;
+				}
+
+				//往上回溯
+				k = index;
+				index = HT[index].parent;
+			}
+
+			//将当前结点编码v放入codes
+			codes.push_back(v);
 
 		}
 	}
+
 };

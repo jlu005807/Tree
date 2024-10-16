@@ -1,3 +1,4 @@
 ﻿  main.cpp
-D:\Visual Studio 2022\source\repos\Tree\Tree\HuffmanTree.h(122,1): warning C4715: “HuffmanTree_manager<int>::CreatTree”: 不是所有的控件路径都返回值
+D:\Visual Studio 2022\source\repos\Tree\Tree\Expression_Tree.h(133,14): warning C4244: “return”: 从“double”转换到“int”，可能丢失数据
+D:\Visual Studio 2022\source\repos\Tree\Tree\Expression_Tree.h(137,1): warning C4715: “Expression_Tree::calculate”: 不是所有的控件路径都返回值
   Tree.vcxproj -> D:\Visual Studio 2022\source\repos\Tree\x64\Debug\Tree.exe

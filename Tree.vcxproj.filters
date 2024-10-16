@@ -27,6 +27,9 @@
     <ClInclude Include="HuffmanTree.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Expression_Tree.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
