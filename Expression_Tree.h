@@ -65,6 +65,11 @@ public:
 		int i = 0;
 		for (int i = 0; i < exp.size(); i++)
 		{
+			if (exp[i] == ' ')
+			{
+				continue;
+			}
+
 			//如果不是运算符
 			if (!Isoperate(exp[i]))
 			{
@@ -81,11 +86,23 @@ public:
 				{
 					optr.push_back(exp[i]);
 				}
-				//比较OPTR的栈顶元素和ch的优先级
-				else if (precedence(optr.back()) == precedence(exp[i]) && precedence(exp[i]) == 0)//OPTR的栈顶元素等于ch的优先级,OPTR的栈顶元素是"("且ch是")"
+				else if (exp[i] == '(')//左括号直接压入
 				{
-					optr.pop_back();
+					optr.push_back(exp[i]);
 				}
+				else if (exp[i] == ')')
+				{
+					while (exp.back() != '(')
+					{
+						address();
+					}
+					exp.pop_back();//删除左括号
+				}
+				else if (optr.empty() || optr.back() == '(')
+				{
+					optr.push_back(exp[i]);
+				}
+				//比较OPTR的栈顶元素和ch的优先级
 				else if (precedence(optr.back()) < precedence(exp[i]))//OPTR的栈顶元素小于ch的优先级
 				{
 					//当前字符压入OPTR栈， 读入下一字符
