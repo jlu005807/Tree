@@ -58,5 +58,17 @@ public:
 
 	//暂时不考虑删除和移动
 
+	//返回集合的数量
+	size_t number_set()
+	{
+		int count = 0;
+		//如果一个节点的根指向自己，说明为整棵树的根即一个集合
+		for (auto i = 0; i < pa.size(); i++)
+		{
+			if (pa[i] == i)count++;
+		}
+
+		return count;
+	}
 
 };

@@ -174,4 +174,57 @@ public:
 		}
 	}
 
+
+	//将一串二进制代码code译码为n个HT叶子节点对应的编号(从一开始），译码非法则返回“INVALID”
+	std::string decode(HuffmanTree<int>* HT, std::string code, int n)
+	{
+		int k;
+
+		//只有一个节点时特殊考虑
+		k = (n == 1) ? 2 : 2 * n - 1;
+
+		std::string postcode;
+
+		int i = 0;
+
+		while (i < code.size())
+		{
+			//到达叶子节点，放入编号
+			if (HT[k].lchild == 0 && HT[k].rchild == 0)
+			{
+				postcode.push_back(k);
+
+				k = (n == 1) ? 2 : 2 * n - 1;
+			}
+			else
+			{
+				//为零时左移
+				if (code[i] == '0')
+				{
+					k = HT[k].lchild;
+					i++;
+				}
+				//为一时右移
+				else if (code[i] == '1')
+				{
+
+					k = HT[k].rchild;
+					i++;
+				}
+
+			}
+		}
+
+		//最后一次判断是否为叶子节点，即刚好到叶子节点完成译码，否则即为译码非法序列
+		if (HT[k].lchild == 0 && HT[k].rchild == 0)
+		{
+			postcode.push_back(k);
+			return postcode;
+		}
+		else
+		{
+			return { "INVALID" };
+		}
+	}
+
 };
